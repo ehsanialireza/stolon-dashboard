@@ -2,21 +2,45 @@
 stolon is a cloud native PostgreSQL manager for PostgreSQL high availability. It's cloud native because it'll let you keep an high available PostgreSQL inside your containers (kubernetes integration) but also on every other kind of infrastructure (cloud IaaS, old style infrastructures etc...)
 [stolon official github](https://github.com/sorintlab/stolon)
 
-# what dose this ansible-playbook do?
-
-this ansible-playbook installs and configs stolon cluster components 
-including:
-* etcd
-* stolon-sentinel
-* stolon-keeper
-* stolon-proxy
+# what dose this dashboard do?
+This is a simple Grafana dashboard developed for monitoring the status of various Stolon components (Keeper, Proxy, Sentinel, etc.). It allows for analyzing the behavior of the database cluster, ensuring its proper functioning, and setting up alert rules when needed.
 
 # how to use it?
-first of all, you need to install ansible and ansible-playbook 
+first of all, you need to install prometheus and grafana
+you can use this docker compose file
 
 ```
-sudo apt update
-sudo apt install ansible
+version: '3.7'
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring
+    restart: always
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
+    restart: always
+
+networks:
+  monitoring:
+    driver: bridge
+
 ```
 ## roles
 there is three role, first one is for installing and configuring etcd and the second one, dose the same for stolon keeper and the third one is for stolon-proxy.
