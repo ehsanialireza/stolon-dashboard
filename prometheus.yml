@@ -1,0 +1,4 @@
+- job_name: 'stolon-database-cluster'
+  static_configs:
+    - targets: ['<stolon-component-ip>:<metric-exporter-ip>']
+
